@@ -1,0 +1,36 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.env
+.venv
+venv/
+
+# Data files (too large for git; download from Divvy system data)
+data/
+*.csv
+
+# Videos and personal documents
+*.mov
+*.mp4
+*.docx
+*.pptx
+
+# Spark / Hadoop
+derby.log
+metastore_db/
+spark-warehouse/
