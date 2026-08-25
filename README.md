@@ -72,5 +72,75 @@ The notebook is self-contained — each section builds on the previous one.
 
 ## Key Findings
 
-- The Random Forest classifier achieves high accuracy in predicting Subscriber vs Customer status, driven mainly by `trip_duration` and `rider_age`.
-- PageRank and net-flow metrics identify a small set of high-traffic hub stations where rebalancing effort has the greatest impact.
+### Customer conversion model
+
+Three classifiers were compared on the same Spark ML pipeline, then the Random Forest was tuned
+with cross-validation:
+
+| Model | Accuracy |
+|---|:---:|
+| Decision Tree | 0.869 |
+| Random Forest | 0.866 |
+| Logistic Regression | 0.865 |
+
+**Tuned Random Forest** (100 trees, max depth 8) — the model taken forward:
+
+| Metric | Value |
+|---|:---:|
+| Accuracy | 0.868 |
+| AUC | 0.873 |
+| F1 | 0.856 |
+| Precision (overall) | 0.885 |
+
+**The headline accuracy hides the part that matters.** Broken out by class, the model identifies
+Subscribers reliably but is much weaker on casual Customers — the class the business actually
+wants to find:
+
+| Casual Customer class | Value |
+|---|:---:|
+| Precision | 0.979 |
+| **Recall** | **0.569** |
+| F1 | 0.719 |
+
+In other words, when the model flags a casual rider it is almost always right, but it misses
+roughly 43% of them. For a conversion campaign that is a real constraint: the targeted list will
+be clean but incomplete. Subscribers heavily outnumber casual riders in the data, which is what
+drives both the high overall accuracy and the low minority-class recall.
+
+The strongest predictors are `trip_duration` and `rider_age` — casual riders take noticeably
+longer trips, consistent with leisure rather than commuting use.
+
+### Station network & rebalancing
+
+PageRank over the station-to-station trip graph concentrates importance in a small set of
+lakefront and downtown hubs — Lake Shore Dr & Monroe St, Streeter Dr & Grand Ave, Lake Shore Dr
+& North Blvd, Millennium Park and Michigan Ave & Oak St lead the ranking. Combined with net-flow
+(departures minus arrivals), these identify where rebalancing vans have the greatest effect per
+stop.
+
+---
+
+## Business Recommendations
+
+1. **Route rebalancing around the top PageRank hubs**, not around raw trip counts. PageRank
+   weights a station by the importance of the stations it connects to, which better reflects
+   knock-on availability effects across the network.
+2. **Use the conversion model for targeting, not for sizing the opportunity.** With 57% recall
+   it produces a high-precision shortlist; it will understate how many casual riders are
+   convertible.
+3. **Improve minority-class recall before running a campaign** — class weighting or threshold
+   tuning — if the goal is reach rather than precision.
+4. **Anchor conversion offers on trip duration.** It is the strongest behavioural separator
+   between casual and subscribed riders.
+
+---
+
+## Limitations
+
+- **Q3 2019 only** — the peak summer season. Rebalancing and conversion patterns will differ in
+  winter, and the findings should not be generalised across the year.
+- **Class imbalance was not corrected**, which is why overall accuracy looks strong while
+  casual-rider recall does not.
+- **The graph analysis treats the season as static**, ignoring time-of-day flow reversal
+  (commuter inbound in the morning, outbound in the evening) that matters for real rebalancing.
+- Rider age is derived from birth year, which is self-reported and missing for many casual riders.
