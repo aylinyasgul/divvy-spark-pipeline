@@ -93,7 +93,7 @@ with cross-validation:
 | Precision (overall) | 0.885 |
 
 **The headline accuracy hides the part that matters.** Broken out by class, the model identifies
-Subscribers reliably but is much weaker on casual Customers — the class the business actually
+Subscribers reliably but is much weaker on casual Customers — the class the business
 wants to find:
 
 | Casual Customer class | Value |
