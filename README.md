@@ -107,15 +107,18 @@ roughly 43% of them. For a conversion campaign that is a real constraint: the ta
 be clean but incomplete. Subscribers heavily outnumber casual riders in the data, which is what
 drives both the high overall accuracy and the low minority-class recall.
 
-The strongest predictors are `trip_duration` and `rider_age` — casual riders take noticeably
-longer trips, consistent with leisure rather than commuting use.
+The strongest predictors are start hour (importance 0.34) and gender (0.15) — subscribers ride
+at the commuting peaks, casual riders in the middle of the day. Trip duration was deliberately
+left out of the features: it is only known once a trip ends, so using it would leak information
+the model would not have at the start of a trip. Rider age contributed almost nothing, possibly
+because it is missing for many casual riders and was filled with the median.
 
 ### Station network & rebalancing
 
 PageRank over the station-to-station trip graph concentrates importance in a small set of
 lakefront and downtown hubs — Lake Shore Dr & Monroe St, Streeter Dr & Grand Ave, Lake Shore Dr
 & North Blvd, Millennium Park and Michigan Ave & Oak St lead the ranking. Combined with net-flow
-(departures minus arrivals), these identify where rebalancing vans have the greatest effect per
+(arrivals minus departures), these identify where rebalancing vans have the greatest effect per
 stop.
 
 ---
@@ -130,8 +133,8 @@ stop.
    convertible.
 3. **Improve minority-class recall before running a campaign** — class weighting or threshold
    tuning — if the goal is reach rather than precision.
-4. **Anchor conversion offers on trip duration.** It is the strongest behavioural separator
-   between casual and subscribed riders.
+4. **Time conversion offers around when people ride.** Start hour is the strongest behavioural
+   separator between casual and subscribed riders.
 
 ---
 
